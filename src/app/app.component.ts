@@ -1,6 +1,7 @@
 import {Component, HostListener} from '@angular/core';
 import options from '../options';
 import {FormBuilder, Validators} from "@angular/forms";
+import {AppService} from "./app.service";
 
 @Component({
   selector: 'app-root',
@@ -14,69 +15,32 @@ export class AppComponent {
     car: ['', Validators.required],
   })
 
-  carData = [
-    {
-      image: '1.png',
-      title: 'Lamborghini Huracan Spyder',
-      gear: 'полный',
-      engine: 5.2,
-      places: 2
-    },
-    {
-      image: '2.png',
-      title: 'Chevrolet Corvette',
-      gear: 'полный',
-      engine: 6.2,
-      places: 2
-    },
-    {
-      image: '3.png',
-      title: 'Ferrari California',
-      gear: 'полный',
-      engine: 3.9,
-      places: 4
-    },
-    {
-      image: '4.png',
-      title: 'Lamborghini Urus',
-      gear: 'полный',
-      engine: 4.0,
-      places: 5
-    },
-    {
-      image: '5.png',
-      title: 'Audi R8',
-      gear: 'полный',
-      engine: 5.2,
-      places: 2
-    },
-    {
-      image: '6.png',
-      title: 'Chevrolet Camaro',
-      gear: 'полный',
-      engine: 2.0,
-      places: 4
-    }
-  ]
+  carData: any;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private appService: AppService) {
+  }
+
+  ngOnInit() {
+    this.appService.getData().subscribe(carData => this.carData = carData);
   }
 
   goScroll(target: HTMLElement, car?: any) {
     target.scrollIntoView(options.behavior);
 
     if (car) {
-      this.priceForm.patchValue({ car: car.title });
+      this.priceForm.patchValue({car: car.name});
     }
   }
 
   trans: any;
+
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent) {
     this.trans = {transform: 'translate3d(' + ((e.clientX * 0.2) / 12) + 'px,' + ((e.clientY * 0.3) / 8) + 'px,0px)'};
   }
 
   bgPos: any;
+
   @HostListener('document:scroll', ['$event'])
   onScroll() {
     this.bgPos = {backgroundPositionX: '0' + (0.2 * window.scrollY) + 'px'};
@@ -84,9 +48,22 @@ export class AppComponent {
 
   sendRequestCar() {
     if (this.priceForm.valid) {
+      const $modal: any = document?.querySelector('.modal-successful');
+      const priceForm = this.priceForm;
+
       document?.querySelector('body')?.classList.add('relative');
-      document?.querySelector('.modal-successful')?.classList.remove('d-none');
-      this.priceForm.reset();
+
+      this.appService.sendQuery(this.priceForm.value).subscribe({
+        next: function (response: any) {
+          $modal.querySelector('h3').textContent = String(response.message);
+          priceForm.reset();
+        },
+        error(response: any) {
+          $modal.querySelector('h3').textContent = String(response.error.message);
+        }
+      });
+
+      $modal?.classList.remove('d-none');
     }
   }
 

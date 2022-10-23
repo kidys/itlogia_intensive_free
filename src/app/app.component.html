@@ -1,6 +1,6 @@
 <div class="modal-successful d-none">
   <div class="modal-successful__content">
-    <h3>Спасибо за заявку мы с Вами скоро свяжемся!</h3>
+    <h3></h3>
     <button class="btn btn--modal" (click)="modalClose()">Закрыть</button>
   </div>
 </div>
@@ -42,9 +42,9 @@
     <div class="our-fleet__items">
       <div class="our-fleet__item" *ngFor="let car of carData">
         <div class="our-fleet__item-img">
-          <img src="../assets/images/{{ car.image }}" alt="{{ car.title }}">
+          <img src="{{ car.image }}" alt="{{ car.name }}">
         </div>
-        <div class="our-fleet__item-title">{{ car.title }}</div>
+        <div class="our-fleet__item-title">{{ car.name }}</div>
         <div class="our-fleet__item-info">
           <div class="our-fleet__item-point">
             <img src="../assets/images/icons/gear.svg" alt="gear icon">
